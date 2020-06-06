@@ -1,5 +1,5 @@
 # BWTst-Compiler
-This is a transpiler for the language UrduBasic that transpiles it to Python.
+This is a transpiler for the domain specific language [Bwtest](https://github.com/ameerwasi001/BWTest) that transpiles it to Python.
 
 # Compiling a file
 You can compile a file by saying `node shell.js inputfilename.btst outputname.py` in your terminal.
