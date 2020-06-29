@@ -227,9 +227,16 @@ class Compiler {
       const res = new RTResult()
       const identifier = node.identifier.value
       let args = []
+      var pre = ""
       for (const arg of node.args) {
-        args.push(res.register(this.compile(arg, context, check)))
+        const arg_value = res.register(this.compile(arg, context, check))
         if (res.error) { return res }
+        if (arg_value.constructor.name == "PrePro"){
+          pre += arg_value.pre + "\n"
+          args.push(arg_value.pro)
+        } else {
+          args.push(arg_value)
+        }
       }
       const string_args = args.join(", ")
       let kwargs = []
@@ -237,10 +244,15 @@ class Compiler {
         const identifier = k
         const value = res.register(this.compile(node.kwargs[k], context, check))
         if (res.error) { return res }
-        kwargs.push(`${identifier} = ${value}`)
+        if (value.constructor.name == "PrePro"){
+          pre += value.pre + "\n"
+          kwargs.push(`${identifier} = ${value.pro}`)
+        } else {
+          kwargs.push(`${identifier} = ${value}`)
+        }
       }
       const string_kwargs = kwargs.join(", ")
-      const final_call = `getattr(helper, '${identifier}')(${string_args} ${(string_kwargs && string_args) ? ', ' + string_kwargs : string_kwargs})`
+      const final_call = new PrePro(pre, `getattr(helper, '${identifier}')(${string_args} ${(string_kwargs && string_args) ? ', ' + string_kwargs : string_kwargs})`)
       return res.success(final_call)
     }
 
